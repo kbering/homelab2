@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: elastic
 resources:
   - namespace.yaml
-  - helmrepository-elastic.yaml
   - helmrelease-elasticsearch.yaml
   - job-upload-license.yaml
   - secret-elastic-credentials.yaml
