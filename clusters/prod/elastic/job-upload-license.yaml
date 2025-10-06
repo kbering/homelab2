@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: es-upload-license
+  namespace: elastic
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: uploader
+          image: curlimages/curl:8.10.1
+          command: ["sh","-c"]
+          args:
+            - |
+              echo "Waiting for Elasticsearch..."
+              until curl -s -k -u "$ELASTIC_USERNAME:$ELASTIC_PASSWORD" https://elasticsearch-master:9200 >/dev/null; do
+                sleep 5
+              done
+              echo "Uploading Enterprise license..."
+              curl -k -u "$ELASTIC_USERNAME:$ELASTIC_PASSWORD"                    -H 'Content-Type: application/json'                    -X PUT 'https://elasticsearch-master:9200/_license?acknowledge=true'                    --data-binary @/license/license.json
+              echo "Done."
+          envFrom:
+            - secretRef:
+                name: elastic-credentials
+          volumeMounts:
+            - name: license
+              mountPath: /license
+      volumes:
+        - name: license
+          secret:
+            secretName: es-license

@@ -1,0 +1,35 @@
+replicas: 3
+
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.license.self_generated.type: basic
+
+extraEnvs:
+  - name: ELASTIC_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: elastic-username
+  - name: ELASTIC_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: elastic-password
+
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 50Gi
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "2Gi"
+  limits:
+    cpu: "2"
+    memory: "8Gi"
+
+service:
+  type: ClusterIP

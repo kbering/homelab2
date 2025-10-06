@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: elastic
+resources:
+  - namespace.yaml
+  - helmrepository-elastic.yaml
+  - helmrelease-elasticsearch.yaml
+  - job-upload-license.yaml
+  - secret-elastic-credentials.yaml
+  - secret-es-license.yaml
+
+configMapGenerator:
+  - name: elasticsearch-values
+    files:
+      - values.yaml=values-elasticsearch.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
