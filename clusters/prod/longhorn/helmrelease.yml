@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  releaseName: longhorn
+  targetNamespace: longhorn-system
+  interval: 15m
+  install:
+    createNamespace: false   # behold PSA-labels fra namespace.yaml
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  chart:
+    spec:
+      chart: longhorn
+      version: 1.7.0          # eller den version du vil bruge
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: flux-system
+  # Hent values fra ConfigMap genereret af Kustomize (se kustomization.yaml)
+  valuesFrom:
+    - kind: ConfigMap
+      name: longhorn-values
+      valuesKey: values.yml
