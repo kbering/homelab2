@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 10m
   prune: true
-  path: ./clusters/prod/longhorn
+  path: ./clusters/prod/longhorn   # ✅ peger på mappen med helmrelease/kustomization/namespace
   sourceRef:
     kind: GitRepository
-    name: flux-system    # standardnavnet fra flux bootstrap
+    name: flux-system

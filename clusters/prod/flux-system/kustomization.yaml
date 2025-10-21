@@ -1,8 +1,8 @@
-# clusters/prod/flux-system/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: flux-system
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - kustomization-longhorn.yaml 
+  - helmrepository-elastic.yaml
+  - helmrepository-longhorn.yaml      # ✅ HelmRepository (charts.longhorn.io)
+  - kustomization-longhorn.yaml       # ✅ Kustomization CR, der peger på ./clusters/prod/longhorn
