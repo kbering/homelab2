@@ -5,5 +5,4 @@ namespace: flux-system
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - helmrepository-elastic.yaml
-  - helmrepository-longhorn.yaml  
+  - kustomization-longhorn.yaml 
