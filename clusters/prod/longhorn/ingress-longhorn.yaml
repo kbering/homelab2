@@ -12,7 +12,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-  - host: longhorn.example.com          # byt til dit domæne
+  - host: localhost          # byt til dit domæne
     http:
       paths:
       - path: /
