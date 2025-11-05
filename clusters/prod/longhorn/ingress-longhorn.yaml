@@ -1,28 +1,23 @@
-# clusters/prod/longhorn/ingress-longhorn.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
-  name: longhorn-ui
+  name: allow-portforward-to-longhorn-ui
   namespace: longhorn-system
-  annotations:
-    # Kun hvis du bruger host-network mode og dedicated LB – vælg en ledig port >1023
-    # ingress.cilium.io/host-listener-port: "8080"
-    # Tving HTTPS redirect hvis du vil (kræver TLS sektion nedenfor)
-    # ingress.cilium.io/force-https: "enabled"
 spec:
-  ingressClassName: cilium
-  rules:
-  - host: localhost          # byt til dit domæne
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: longhorn-frontend
-            port:
-              number: 80
-  # Valgfrit: TLS (brug din egen secret med cert)
-  # tls:
-  # - hosts: [longhorn.example.com]
-  #   secretName: longhorn-tls
+  endpointSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: ["longhorn-ui"]
+      - key: app.kubernetes.io/name
+        operator: In
+        values: ["longhorn-ui"]
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "8000"
+        protocol: TCP
