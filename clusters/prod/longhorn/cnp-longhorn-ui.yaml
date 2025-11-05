@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-portforward-to-longhorn-ui
+  namespace: longhorn-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: longhorn-ui
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "8000"
+        protocol: TCP
