@@ -4,6 +4,7 @@ namespace: longhorn-system
 resources:
   - namespace.yaml
   - helmrelease.yaml              # sørg for at filendelsen matcher
+  - ingress-longhorn.yaml
 configMapGenerator:
   - name: longhorn-values
     files:
