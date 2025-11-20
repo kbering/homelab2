@@ -1,0 +1,28 @@
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: homelab-l2-policy
+  namespace: kube-system
+spec:
+  # Hvilke interfaces der skal bruges til L2 announcements
+  # Lad tom for at bruge alle interfaces, eller specificer:
+  # interfaces:
+  #   - eth0
+  #   - ^en.*  # regex pattern
+
+  # Brug externalIPs fra services (typisk false for LB-IPAM)
+  externalIPs: false
+
+  # Brug LoadBalancer IPs (dette er hvad vi vil have)
+  loadBalancerIPs: true
+
+  # Node selector - vælg hvilke noder der annoncerer IPs
+  # Tom = alle noder kan annoncere
+  nodeSelector:
+    matchLabels: {}
+
+  # Service selector - vælg hvilke services der får L2 announcements
+  # Tom = alle LoadBalancer services
+  serviceSelector:
+    matchLabels: {}
