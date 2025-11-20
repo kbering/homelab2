@@ -6,6 +6,7 @@ resources:
   - helmrelease.yaml              # sørg for at filendelsen matcher
   - ingress-longhorn.yaml
   - cnp-longhorn-ui.yaml
+  - service-lb.yaml
 configMapGenerator:
   - name: longhorn-values
     files:

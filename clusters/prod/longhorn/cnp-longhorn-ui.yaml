@@ -12,6 +12,7 @@ spec:
     - host
     - remote-node
     - kube-apiserver
+    - world
     toPorts:
     - ports:
       - port: "8000"
