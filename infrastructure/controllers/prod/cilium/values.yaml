@@ -3,6 +3,10 @@ ipam:
 
 kubeProxyReplacement: true
 
+# Enable socket LB for pods to reach Kubernetes services
+socketLB:
+  enabled: true
+
 securityContext:
   capabilities:
     ciliumAgent:
