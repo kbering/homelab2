@@ -9,7 +9,7 @@ spec:
     # VIGTIGT: Skift denne IP-range til dit eget netværk!
     # Eksempel: Hvis dit netværk er 192.168.1.0/24,
     # vælg en range som ikke bruges af DHCP eller andre enheder
-    - cidr: "192.168.1.200/29"  # Giver 192.168.1.200-207 (6 brugbare IPs)
+    - cidr: "10.17.0.200/29"  # Giver 192.168.1.200-207 (6 brugbare IPs)
     # Alternativt kan du bruge start/stop:
     # - start: "192.168.1.200"
     #   stop: "192.168.1.210"
