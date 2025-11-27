@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - helmrepository-elastic.yaml
   - helmrepository-longhorn.yaml      # ✅ HelmRepository (charts.longhorn.io)
   - kustomization-longhorn.yaml       # ✅ Kustomization CR, der peger på ./clusters/prod/longhorn
   - kustomization-cilium-config.yaml  # ✅ Cilium LB-IPAM og L2 announcement policies
