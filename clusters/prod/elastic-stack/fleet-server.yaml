@@ -11,6 +11,7 @@ spec:
   - name: elasticsearch
   mode: fleet
   fleetServerEnabled: true
+  policyID: fleet-server-policy
   deployment:
     replicas: 1
     podTemplate:
@@ -19,6 +20,10 @@ spec:
         automountServiceAccountToken: true
         securityContext:
           runAsUser: 0
+  http:
+    service:
+      spec:
+        type: LoadBalancer
 ---
 apiVersion: v1
 kind: ServiceAccount
