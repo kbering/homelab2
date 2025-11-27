@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: elastic-eck
+  name: elastic-eck-operator
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./clusters/prod/elastic-eck
+  path: ./clusters/prod/elastic-eck-operator
   prune: true
   sourceRef:
     kind: GitRepository
