@@ -7,3 +7,4 @@ resources:
   - helmrepository-longhorn.yaml      # ✅ HelmRepository (charts.longhorn.io)
   - kustomization-longhorn.yaml       # ✅ Kustomization CR, der peger på ./clusters/prod/longhorn
   - kustomization-cilium-config.yaml  # ✅ Cilium LB-IPAM og L2 announcement policies
+  - kustomization-elastic-eck.yaml    # ✅ Elastic ECK operator og stack
