@@ -4,4 +4,4 @@ namespace: elastic
 resources:
   - elasticsearch.yaml
   - kibana.yaml
-  # fleet-server.yaml - tilføjes når ECK operator er færdig
+  - fleet-server.yaml
