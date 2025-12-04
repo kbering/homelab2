@@ -281,6 +281,7 @@ flux get helmreleases -A
 | Hubble UI | ✅ Running | http://10.17.0.202 | N/A |
 | Elasticsearch | ✅ Green (3 nodes) | Internal | 150GB (3x50GB) |
 | Kibana | ✅ Green | http://10.17.0.203:5601 | N/A |
+| Fleet Server | ✅ Green (9.2.1) | https://10.17.0.204:8220 | N/A |
 | ECK Operator | ✅ Running | N/A | N/A |
 
 **Credentials:**
@@ -321,4 +322,5 @@ spec:
 ```
 
 **Resultat:**
-✅ Fleet Server kan nu hente korrekt image
+✅ Fleet Server deployed successfully med version 9.2.1
+✅ LoadBalancer IP: https://10.17.0.204:8220
