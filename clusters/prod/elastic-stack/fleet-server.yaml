@@ -4,7 +4,8 @@ metadata:
   name: fleet-server
   namespace: elastic
 spec:
-  version: 8.16.1
+  version: 9.2.1
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.2.1
   kibanaRef:
     name: kibana
   elasticsearchRefs:

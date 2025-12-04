@@ -285,3 +285,40 @@ flux get helmreleases -A
 
 **Credentials:**
 - Kibana: `elastic` / (se secret: `elasticsearch-es-elastic-user`)
+
+---
+
+## Problem 5: Fleet Server Image Not Found (version 9.2.1)
+
+**Symptom:**
+```
+Failed to pull image "docker.elastic.co/beats/elastic-agent:9.2.1": not found
+ImagePullBackOff
+```
+
+**Root Cause:**
+ECK operator bruger det gamle registry path `docker.elastic.co/beats/elastic-agent`, men Elastic Agent version 9.x er flyttet til det nye path: `docker.elastic.co/elastic-agent/elastic-agent`
+
+**Løsning:**
+Tilføj explicit `image` field i Agent spec for at override default image path:
+
+```yaml
+apiVersion: agent.k8s.elastic.co/v1alpha1
+kind: Agent
+metadata:
+  name: fleet-server
+  namespace: elastic
+spec:
+  version: 9.2.1
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.2.1  # ✅ Korrekt registry path
+  kibanaRef:
+    name: kibana
+  elasticsearchRefs:
+  - name: elasticsearch
+  mode: fleet
+  fleetServerEnabled: true
+  policyID: fleet-server-policy
+```
+
+**Resultat:**
+✅ Fleet Server kan nu hente korrekt image
