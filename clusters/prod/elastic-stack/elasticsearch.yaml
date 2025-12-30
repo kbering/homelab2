@@ -5,6 +5,10 @@ metadata:
   namespace: elastic
 spec:
   version: 9.2.2
+  http:
+    service:
+      spec:
+        type: LoadBalancer
   nodeSets:
   - name: default
     count: 3
