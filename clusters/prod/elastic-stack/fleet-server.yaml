@@ -12,7 +12,6 @@ spec:
   - name: elasticsearch
   mode: fleet
   fleetServerEnabled: true
-  policyID: fleet-server-policy
   deployment:
     replicas: 1
     podTemplate:
