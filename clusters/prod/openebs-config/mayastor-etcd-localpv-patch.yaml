@@ -8,3 +8,7 @@ metadata:
         value: "hostpath"
       - name: BasePath
         value: "/var/mnt/storage/localpv-hostpath/etcd"
+    openebs.io/cas-type: local
+provisioner: openebs.io/local
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
