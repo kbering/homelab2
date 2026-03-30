@@ -11,6 +11,7 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
+    - name: openebs-config
     - name: elastic-eck-operator
   healthChecks:
     - apiVersion: apps/v1

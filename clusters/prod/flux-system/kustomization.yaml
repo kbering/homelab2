@@ -3,8 +3,9 @@ kind: Kustomization
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - helmrepository-longhorn.yaml      # ✅ HelmRepository (charts.longhorn.io)
-  - kustomization-longhorn.yaml       # ✅ Kustomization CR, der peger på ./clusters/prod/longhorn
+  - helmrepository-openebs.yaml
+  - kustomization-openebs.yaml
+  - kustomization-openebs-config.yaml
   - kustomization-cilium-config.yaml  # ✅ Cilium LB-IPAM og L2 announcement policies
   - kustomization-elastic-eck-operator.yaml  # ✅ Elastic ECK operator
   - kustomization-elastic-stack.yaml         # ✅ Elasticsearch, Kibana, Fleet

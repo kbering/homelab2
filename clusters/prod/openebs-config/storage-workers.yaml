@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      name: talos-t95-lam
+      labels:
+        openebs.io/engine: mayastor
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      name: talos-15b-sil
+      labels:
+        openebs.io/engine: mayastor
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      name: talos-e1n-6yg
+      labels:
+        openebs.io/engine: mayastor

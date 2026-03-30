@@ -1,0 +1,29 @@
+apiVersion: openebs.io/v1beta3
+kind: DiskPool
+metadata:
+  name: pool-t95-lam
+  namespace: openebs
+spec:
+  node: talos-t95-lam
+  disks:
+    - aio:///var/local/openebs/io-engine/diskpool.img
+---
+apiVersion: openebs.io/v1beta3
+kind: DiskPool
+metadata:
+  name: pool-15b-sil
+  namespace: openebs
+spec:
+  node: talos-15b-sil
+  disks:
+    - aio:///var/local/openebs/io-engine/diskpool.img
+---
+apiVersion: openebs.io/v1beta3
+kind: DiskPool
+metadata:
+  name: pool-e1n-6yg
+  namespace: openebs
+spec:
+  node: talos-e1n-6yg
+  disks:
+    - aio:///var/local/openebs/io-engine/diskpool.img

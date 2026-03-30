@@ -1,8 +1,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: longhorn
+  name: openebs
   namespace: flux-system
 spec:
-  url: https://charts.longhorn.io
+  url: https://openebs.github.io/openebs
   interval: 30m

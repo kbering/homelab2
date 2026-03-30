@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: mayastor-node-init
+  namespace: openebs
+spec:
+  selector:
+    matchLabels:
+      app: mayastor-node-init
+  template:
+    metadata:
+      labels:
+        app: mayastor-node-init
+    spec:
+      nodeSelector:
+        openebs.io/engine: mayastor
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: init
+          image: docker.io/library/busybox:1.36
+          securityContext:
+            privileged: true
+          command:
+            - sh
+            - -c
+            - |
+              set -eux
+              mkdir -p /storage/localpv-hostpath/etcd
+              chmod 0777 /storage/localpv-hostpath /storage/localpv-hostpath/etcd
+              mkdir -p /io-engine
+              if [ ! -f /io-engine/diskpool.img ]; then
+                truncate -s 20G /io-engine/diskpool.img
+              fi
+              ls -lh /io-engine/diskpool.img
+              sleep 3600
+          volumeMounts:
+            - name: storage
+              mountPath: /storage
+            - name: io-engine
+              mountPath: /io-engine
+      volumes:
+        - name: storage
+          hostPath:
+            path: /var/mnt/storage
+            type: Directory
+        - name: io-engine
+          hostPath:
+            path: /var/local/openebs/io-engine
+            type: DirectoryOrCreate

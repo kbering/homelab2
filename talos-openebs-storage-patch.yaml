@@ -1,13 +1,15 @@
 machine:
+  sysctls:
+    vm.nr_hugepages: "1024"
   disks:
     - device: /dev/sdb
       partitions:
-        - mountpoint: /var/mnt/longhorn
+        - mountpoint: /var/mnt/storage
   kubelet:
     extraMounts:
-      - destination: /var/mnt/longhorn
+      - destination: /var/mnt/storage
         type: bind
-        source: /var/mnt/longhorn
+        source: /var/mnt/storage
         options:
           - bind
           - rshared
