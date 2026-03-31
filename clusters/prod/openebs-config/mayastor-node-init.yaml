@@ -29,9 +29,7 @@ spec:
               mkdir -p /storage/localpv-hostpath/etcd
               chmod 0777 /storage/localpv-hostpath /storage/localpv-hostpath/etcd
               mkdir -p /io-engine
-              if [ ! -f /io-engine/diskpool.img ]; then
-                truncate -s 20G /io-engine/diskpool.img
-              fi
+              truncate -s 60G /io-engine/diskpool.img
               ls -lh /io-engine/diskpool.img
               sleep 3600
           volumeMounts:

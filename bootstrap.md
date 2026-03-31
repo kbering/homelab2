@@ -9,30 +9,20 @@ set -euo pipefail
 : "${CLIENT_SECRET:?Sæt CLIENT_SECRET i miljøet}"
 : "${CLUSTER_NAME:?Sæt CLUSTER_NAME i miljøet}"
 : "${KUBECONFIG:?Sæt KUBECONFIG til din kubeconfig sti}"
+: "${GITHUB_TOKEN:?Sæt GITHUB_TOKEN i miljøet til flux bootstrap}"
 
-# Cilium
-CILIUM_VERSION="${CILIUM_VERSION:-1.18.0}"
-CILIUM_NAMESPACE="${CILIUM_NAMESPACE:-kube-system}"
-CILIUM_RELEASE_NAME="${CILIUM_RELEASE_NAME:-cilium}"
-
-# Sti til dine Cilium værdier
-CILIUM_VALUES_PATH="${CILIUM_VALUES_PATH:-infrastructure/controllers/prod/cilium/values.yaml}"
-
-# Flux / GitHub
-GITHUB_OWNER="${GITHUB_OWNER:-mischavandenburg}"
-GITHUB_REPO="${GITHUB_REPO:-homelab}"
+GITHUB_OWNER="${GITHUB_OWNER:-kbering}"
+GITHUB_REPO="${GITHUB_REPO:-homelab2}"
 GITHUB_BRANCH="${GITHUB_BRANCH:-main}"
 GITHUB_PATH="${GITHUB_PATH:-./clusters/${CLUSTER_NAME}}"
-: "${GITHUB_TOKEN:?Sæt GITHUB_TOKEN i miljøet til flux bootstrap}"
 
 ### ---------- Preflight checks ----------
 need() { command -v "$1" >/dev/null 2>&1 || { echo "Mangler $1 på PATH"; exit 1; }; }
 need kubectl
-need helm
 need flux
 
-if [ ! -f "$CILIUM_VALUES_PATH" ]; then
-  echo "❌ Filen $CILIUM_VALUES_PATH findes ikke. Ret stien eller sæt CILIUM_VALUES_PATH."
+if [ ! -d "${GITHUB_PATH}/flux-system" ]; then
+  echo "❌ Forventer Flux manifests i ${GITHUB_PATH}/flux-system"
   exit 1
 fi
 
@@ -56,24 +46,6 @@ stringData:
   ClientSecret: "${CLIENT_SECRET}"
 EOF
 
-### ---------- Cilium via Helm (upgrade --install) ----------
-echo "==> Tilføjer/opfresher Cilium Helm repo"
-helm repo add cilium https://helm.cilium.io >/dev/null 2>&1 || true
-helm repo update >/dev/null
-
-echo "==> Installerer/opgraderer Cilium ${CILIUM_VERSION} med værdier fra ${CILIUM_VALUES_PATH}"
-helm upgrade --install "${CILIUM_RELEASE_NAME}" cilium/cilium \
-  --version "${CILIUM_VERSION}" \
-  --namespace "${CILIUM_NAMESPACE}" --create-namespace \
-  -f "${CILIUM_VALUES_PATH}"
-
-echo "==> Venter på at Cilium pods bliver Ready"
-kubectl -n "${CILIUM_NAMESPACE}" rollout status ds/cilium --timeout=3m || true
-kubectl -n "${CILIUM_NAMESPACE}" get pods -l k8s-app=cilium
-
-
-cilium install-cli
-
 ### ---------- Flux bootstrap til GitHub ----------
 echo "==> Bootstrapper Flux til GitHub: ${GITHUB_OWNER}/${GITHUB_REPO} (${GITHUB_BRANCH}) path=${GITHUB_PATH}"
 flux bootstrap github \
@@ -83,4 +55,26 @@ flux bootstrap github \
   --path="${GITHUB_PATH}" \
   --personal
 
-echo "✅ Alt færdigt!"
+### ---------- Seed repo-defined Kustomizations immediately ----------
+echo "==> Anvender Flux manifests fra repoet"
+kubectl apply -k "${GITHUB_PATH}/flux-system"
+
+echo "==> Reconciler Flux source og root kustomization"
+flux reconcile source git flux-system -n flux-system
+flux reconcile kustomization flux-system -n flux-system --with-source || true
+
+echo "==> Venter på Cilium"
+kubectl -n kube-system rollout status ds/cilium --timeout=5m || true
+kubectl -n kube-system get pods -l k8s-app=cilium
+
+echo "==> Fjerner kube-flannel og kube-proxy efter Cilium er landet"
+kubectl -n kube-system delete daemonset kube-flannel --ignore-not-found=true
+kubectl -n kube-system delete daemonset kube-proxy --ignore-not-found=true
+
+echo "==> Reconciler Cilium-config efter CRDs er klar"
+flux reconcile kustomization cilium -n flux-system --with-source || true
+flux reconcile kustomization cilium-config -n flux-system --with-source || true
+
+echo "✅ Bootstrap færdig. Verificer med:"
+echo "   kubectl get kustomizations -n flux-system"
+echo "   kubectl get svc -A | grep LoadBalancer"

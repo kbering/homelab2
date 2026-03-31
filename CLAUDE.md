@@ -11,7 +11,7 @@ This is a GitOps-managed Kubernetes homelab running on Talos Linux. The cluster 
 **Core Infrastructure:**
 - **OS**: Talos Linux (immutable Kubernetes OS)
 - **CNI**: Cilium 1.16.6+ with kubeProxy replacement, eBPF datapath
-- **Storage**: Longhorn 1.7.0 (distributed block storage)
+- **Storage**: OpenEBS Mayastor 4.4.0 (distributed block storage)
 - **GitOps**: Flux CD v2 (10-30 minute reconciliation intervals)
 - **Secrets**: External Secrets Operator with Azure Key Vault backend
 
@@ -20,8 +20,9 @@ This is a GitOps-managed Kubernetes homelab running on Talos Linux. The cluster 
 - `clusters/prod/` - Production cluster configuration
   - `flux-system/` - Flux bootstrap and orchestration
   - `cilium/` - LB-IPAM pool and L2 announcements
-  - `longhorn/` - Storage controller
-  - `elastic/` - Elasticsearch 8.x cluster
+  - `openebs/` - OpenEBS Helm release
+  - `openebs-config/` - DiskPools, node labels, and init helpers
+  - `elastic-stack/` - Elasticsearch, Kibana, Fleet
 - `infrastructure/controllers/` - Infrastructure controller definitions (Cilium Helm values)
 
 ## Common Commands
@@ -42,6 +43,15 @@ export GITHUB_REPO="homelab2"
 Run bootstrap:
 ```bash
 ./bootstrap.md
+```
+
+Recommended Talos patches before bootstrap:
+```bash
+# Apply to all nodes if you want Cilium-only networking from first boot
+talosctl patch machineconfig --mode reboot --patch @talos-cilium-gitops-patch.yaml
+
+# Apply to storage workers before OpenEBS/Mayastor install
+talosctl patch machineconfig --mode reboot --patch @talos-openebs-storage-patch.yaml
 ```
 
 ### Flux Operations
@@ -65,13 +75,14 @@ flux logs
 cilium status
 kubectl -n kube-system get pods -l k8s-app=cilium
 
-# Longhorn status
-kubectl -n longhorn-system get pods
+# OpenEBS status
+kubectl -n openebs get pods
+kubectl -n openebs get diskpools.openebs.io
 
 # Elasticsearch
 kubectl -n elastic get pods
 kubectl -n elastic run -it es-shell --rm --image=curlimages/curl -- \
-  curl -k -u 'elastic:PASSWORD' https://elasticsearch-master:9200/_license
+  curl -k -u 'elastic:PASSWORD' https://elasticsearch-es-http:9200/_cluster/health
 ```
 
 ### Encrypt Secrets with SOPS
@@ -85,8 +96,11 @@ sops --encrypt --in-place clusters/prod/elastic/secret-es-license.yaml
 
 - `infrastructure/controllers/prod/cilium/values.yaml` - Cilium CNI configuration
 - `clusters/prod/cilium/ip-pool.yaml` - LoadBalancer IP pool (10.17.0.200/29)
-- `clusters/prod/elastic/values-elasticsearch.yaml` - Elasticsearch settings (3 replicas, 50Gi storage)
-- `clusters/prod/longhorn/values.yml` - Longhorn storage configuration
+- `talos-cilium-gitops-patch.yaml` - Optional Talos patch to disable flannel/kube-proxy
+- `talos-openebs-storage-patch.yaml` - Talos patch for hugepages and `/var/mnt/storage`
+- `clusters/prod/openebs/helmrelease.yaml` - OpenEBS installation
+- `clusters/prod/openebs-config/diskpools.yaml` - Mayastor DiskPool definitions
+- `clusters/prod/elastic-stack/elasticsearch.yaml` - Elasticsearch settings
 
 ## Deployment Patterns
 
@@ -104,12 +118,12 @@ sops --encrypt --in-place clusters/prod/elastic/secret-es-license.yaml
 
 - **LoadBalancer IPs**: 10.17.0.200/29 (managed by Cilium LB-IPAM)
 - **L2 announcements** enabled for all LoadBalancer services
-- **CiliumNetworkPolicies** protect sensitive components (Longhorn UI, etc.)
+- **CiliumNetworkPolicies** can protect sensitive components
 
 ## Namespaces
 
 - `kube-system` - Cilium CNI
-- `longhorn-system` - Storage (privileged PSA)
+- `openebs` - Storage (privileged PSA)
 - `elastic` - Elasticsearch cluster
 - `linkding` - Applications
 - `flux-system` - GitOps controllers
